@@ -22,11 +22,6 @@ struct ContentView: View {
                 Text("Smart Mailbox")
                 Image(systemName: "envelope")
             }.font(.title3)
-            /*
-                .resizable()
-                .scaledToFit()
-                .frame(width: 80,height: 80)
-             */
             Spacer()
             VStack {
                 HStack {

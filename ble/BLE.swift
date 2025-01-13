@@ -17,13 +17,13 @@ class BLE : NSObject, CBCentralManagerDelegate,CBPeripheralDelegate {
     var state : String {
         switch manager.state {
         case .poweredOff:
-            return "Is Powered Off."
+            return "Powered off"
         case .poweredOn:
-            return "Is Powered On."
+            return "Powered on"
         case .unsupported:
-            return "Is Unsupported."
+            return "Unsupported"
         case .unauthorized:
-            return "Is Unauthorized."
+            return "Unauthorized"
         case .unknown:
             return "Unknown"
         case .resetting:
