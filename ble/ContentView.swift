@@ -12,9 +12,11 @@ struct ContentView: View {
     
     
     static let showNotificationsKey = "showNotificationsKey"
-    static let lastMailboxState = "lastMailboxState"
+    static let lastMailboxCountKey = "lastMailboxStateKey"
+    static let lastMailboxDateKey = "lastMailboxDateKey"
     @AppStorage(Self.showNotificationsKey) var showNotifications : Bool = false
-    
+    @AppStorage(Self.lastMailboxCountKey) var lastCount : Int?
+    @AppStorage(Self.lastMailboxDateKey) var lastDate : Date?
     
     var body: some View {
         VStack {
@@ -56,13 +58,14 @@ struct ContentView: View {
                 }.labelsHidden()
                 Text("Show notifications?")
             }
-            Text("State: \(BLE.shared().state)")
+            Text(statusLine)
                 .font(.footnote)
                 .foregroundColor(Color.gray)
         }
         .padding()
         .background(BLE.shared().isReady ? Color.blue.opacity(0.4) : Color.clear)
         .onAppear(){
+            lastCount = 0
             Task {
                 let settings = await UNUserNotificationCenter.current().notificationSettings()
                 if settings.authorizationStatus == .notDetermined {
@@ -76,6 +79,19 @@ struct ContentView: View {
                 _ = try? await UNUserNotificationCenter.current().requestAuthorization(options: options)
             }
         }
+    }
+    var statusLine : String {
+        var ret = "State: \(BLE.shared().state)"
+        if let lastCount = lastCount {
+            ret += "\nLast count was \(lastCount)"
+        }
+        if let lastDate = lastDate {
+            let formatter = DateFormatter()
+            formatter.dateStyle = .short
+            formatter.timeStyle = .short
+            ret += " at \(formatter.string(from: lastDate))"
+        }
+        return ret
     }
     
     @State var requiresNotificationPermission : Bool = false

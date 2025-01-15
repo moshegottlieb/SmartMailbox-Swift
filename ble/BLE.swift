@@ -112,20 +112,28 @@ class BLE : NSObject, CBCentralManagerDelegate,CBPeripheralDelegate {
         requiresAuthorization = authorization != .allowedAlways
     }
     
-    func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: (any Error)?) {
-        print("Disconnected")
-        startScanning()
-    }
     
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: (any Error)?) {
         print("Failed to connect")
         startScanning()
     }
+
+    func didDisconnect(){
+        print("Disconnected")
+        UserDefaults.standard.set(mailCount,forKey: ContentView.lastMailboxCountKey)
+        UserDefaults.standard.set(Date(),forKey: ContentView.lastMailboxDateKey)
+        startScanning()
+    }
+    
+    func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: (any Error)?) {
+        didDisconnect()
+    }
+
     
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, timestamp: CFAbsoluteTime, isReconnecting: Bool, error: (any Error)?) {
         print("Disconnected. Reconnecting: \(isReconnecting)")
         if (!isReconnecting){
-            startScanning()
+            didDisconnect()
         }
     }
     
@@ -145,7 +153,7 @@ class BLE : NSObject, CBCentralManagerDelegate,CBPeripheralDelegate {
             print( "Peer Connected")
         case .peerDisconnected:
             print( "Peer Disconnected")
-            startScanning()
+            didDisconnect()
         @unknown default:
             fatalError()
         }
