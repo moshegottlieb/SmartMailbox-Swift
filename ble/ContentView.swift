@@ -32,7 +32,7 @@ struct ContentView: View {
                         if let mail_count = BLE.shared().mailCount {
                             if mail_count > 0 {
                                 HStack {
-                                    Text("We have mail!").bold()
+                                    Text("You have mail!").bold()
                                     Image(systemName: "envelope.badge.fill")
                                 }.foregroundColor(.indigo)
                             } else {

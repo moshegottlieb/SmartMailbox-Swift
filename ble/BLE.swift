@@ -122,6 +122,7 @@ class BLE : NSObject, CBCentralManagerDelegate,CBPeripheralDelegate {
         print("Disconnected")
         UserDefaults.standard.set(mailCount,forKey: ContentView.lastMailboxCountKey)
         UserDefaults.standard.set(Date(),forKey: ContentView.lastMailboxDateKey)
+        mailCount = nil
         startScanning()
     }
     
@@ -192,7 +193,7 @@ class BLE : NSObject, CBCentralManagerDelegate,CBPeripheralDelegate {
     
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: (any Error)?) {
         guard characteristic == rxCharacteristic else { return }
-        _mailCount = getValue(characteristic: characteristic)
+        mailCount = getValue(characteristic: characteristic)
     }
     
     func setValue(characteristic: CBCharacteristic,value:UInt16){
@@ -216,22 +217,16 @@ class BLE : NSObject, CBCentralManagerDelegate,CBPeripheralDelegate {
         print("Read the value: \(ret)")
         return ret
     }
-    
-    private var _mailCount : UInt16? {
+
+    private(set) var mailCount : UInt16? {
         didSet {
-            if let peripheral = peripheral, let mail_count = _mailCount, (UserDefaults.standard.bool(forKey: ContentView.showNotificationsKey) && mail_count > 0){
+            if let peripheral = peripheral, let mail_count = mailCount, (UserDefaults.standard.bool(forKey: ContentView.showNotificationsKey) && mail_count > 0){
                 let content = UNMutableNotificationContent()
                 content.title = "You have mail!"
                 content.body = "\(mail_count) items in \(peripheral.name ?? "Unknown")"
                 content.sound = UNNotificationSound(named:UNNotificationSoundName("reverby.wav"))
                 UNUserNotificationCenter.current().add(UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil))
             }
-        }
-    }
-    
-    var mailCount : UInt16? {
-        get {
-            return _mailCount
         }
     }
     
